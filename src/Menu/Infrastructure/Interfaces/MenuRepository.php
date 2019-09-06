@@ -4,6 +4,7 @@
 namespace Uetiko\Credit\Menu\Infrastructure\Interfaces;
 
 
+use Uetiko\Credit\Menu\Domain\Exceptions\MenuException;
 use Uetiko\Credit\Menu\Domain\Menu;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotFindException;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotSaveException;
@@ -31,6 +32,7 @@ interface MenuRepository extends Repository
      * @param string $id
      * @return bool
      * @throws MenuNotFindException
+     * @throws MenuException
      */
     public function deleteOnlyChildren(string $id): bool;
 }

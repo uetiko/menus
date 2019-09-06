@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Uetiko\Credit\Menu\Infrastructure;
 use PDO;
 use PDOException;
+use Uetiko\Credit\Menu\Domain\Exceptions\MenuException;
 use Uetiko\Credit\Menu\Domain\Menu;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotHaveChildrenException;
 use Uetiko\Credit\Menu\Infrastructure\Settings;
@@ -187,21 +188,21 @@ class MenuRepository implements Repository
         return true;
     }
 
+    /**
+     * @param string $id
+     * @return bool
+     */
     public function delete(string $id): bool
     {
         $rows = 0;
 
-        try{
-            $rows = $this->connection->exec();
-        } catch (PDOException $exception){
-            throw new MenuNotSaveException();
+        try {
+            $this->deleteOnlyChildren($id);
+        } catch (MenuNotHaveChildrenException $exception) {
         }
 
-        if (0 == $rows){
-            throw  new MenuNotFindException();
-        }else{
-            return true;
-        }
+        $this->delete->bindParam($id);
+        return $this->delete->execute();
     }
 
     public function __destruct()
@@ -232,6 +233,7 @@ class MenuRepository implements Repository
      * @param string $id
      * @return bool
      * @throws MenuNotHaveChildrenException
+     * @throws MenuException
      */
     public function deleteOnlyChildren(string $id): bool
     {
@@ -241,6 +243,23 @@ class MenuRepository implements Repository
             throw new MenuNotHaveChildrenException();
         }
 
-        foreach ($children as $child) {}
+        $this->connection->beginTransaction();
+
+        foreach ($children as $child) {
+            $this->delete->bindParam(':id', $child['id_child']);
+            $rollback = false;
+            try {
+                $this->delete->execute();
+            } catch (PDOException $exception) {
+                $rollback = $this->connection->rollBack();
+            }
+             break;
+        }
+
+        if(true == $rollback){
+            throw new MenuException();
+        }
+
+        return $this->connection->commit();
     }
 }
