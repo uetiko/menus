@@ -1,0 +1,17 @@
+{
+  "name": "uetiko/credit",
+  "description": "un test de menus",
+  "license": "Apache-2.0",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Angel Barrientos",
+      "email": "uetiko@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Uetiko\\Credit\\": "src/"
+    }
+  }
+}
