@@ -16,8 +16,16 @@ class MenuRepository implements Repository
     private $insert = null;
     /** @var \PDOStatement */
     private $insertRelationship = null;
+    /** @var $update \PDOStatement */
     private $update = null;
+    /** @var $delete \PDOStatement */
     private $delete = null;
+    /** @var $find \PDOStatement */
+    private $find = null;
+    /** @var $findRelation \PDOStatement */
+    private $findRelation = null;
+    /** @var $findAll \PDOStatement */
+    private $findAll = null;
 
     public function __construct(Settings $setting)
     {
@@ -28,6 +36,11 @@ class MenuRepository implements Repository
             $setting->getDatabaseUserName(),
             $setting->getDatabasePassword()
         );
+
+        $this->initStatements();
+    }
+
+    private function initStatements():void {
         $this->insert = $this->connection->prepare(
             "INSERT INTO menu (id, name, description)
                        VALUES (:id, :name, :description)"
@@ -36,10 +49,25 @@ class MenuRepository implements Repository
             "INSERT INTO menu_relationship(id, id_parent, id_child)
                        VALUES (:id, :id_parent, :id_child)"
         );
+
+        $this->find = $this->connection->prepare(
+            "SELECT id, name, description
+                       FROM menu
+                       WHERE id = :id"
+        );
+
+        $this->findAll = $this->connection->prepare(
+            "SELECT r.id, r.id_parent, r.id_child
+                       FROM menu_relationship r
+                       order by r.id_parent asc;
+            "
+        );
+
+        $this->findRelation = $this->connection->prepare();
     }
 
     /**
-     * @param int $id
+     * @param string $id
      * @param string $name
      * @param string $description
      * @return bool
@@ -69,7 +97,7 @@ class MenuRepository implements Repository
     }
 
     /**
-     * @param int $id
+     * @param string $id
      * @param Menu $parent
      * @param Menu $child
      * @return bool
@@ -99,10 +127,23 @@ class MenuRepository implements Repository
         }
     }
 
+    /**
+     * @param string $id
+     * @return array
+     * @throws MenuNotFindException
+     */
     public function findById(string $id): array
     {
-        $statement = $this->connection->query();
-        return  $statement->fetch(PDO::FETCH_ASSOC);
+        $find = [];
+        $this->find->bindParam(':id', $id);
+        $this->find->execute();
+        $find = $this->find->fetch(PDO::FETCH_ASSOC);
+
+        if(true == empty($find)) {
+            throw new MenuNotFindException();
+        } else {
+            return $find;
+        }
     }
 
     public function findAll(): array
