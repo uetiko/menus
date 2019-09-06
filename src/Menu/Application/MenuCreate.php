@@ -5,7 +5,7 @@ namespace Uetiko\Credit\Menu\Application;
 use Ramsey\Uuid\UuidInterface;
 use Uetiko\Credit\Menu\Domain\Menu;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotSaveException;
-use Uetiko\Credit\Menu\Infrastructure\Interfaces\Repository;
+use Uetiko\Credit\Menu\Infrastructure\Interfaces\MenuRepository;
 use Ramsey\Uuid\Uuid;
 
 class MenuCreate
@@ -20,7 +20,7 @@ class MenuCreate
     private $menuRepository = null;
 
     public function __construct(
-        string $id, string $name, string $description, Repository $menuRepository
+        string $id, string $name, string $description, MenuRepository $menuRepository
     )
     {
         $this->menu = new Menu($id, $name, $description);

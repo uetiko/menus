@@ -5,7 +5,7 @@ use PDO;
 use PDOException;
 use Uetiko\Credit\Menu\Domain\Menu;
 use Uetiko\Credit\Menu\Infrastructure\Settings;
-use Uetiko\Credit\Menu\Infrastructure\Interfaces\Repository;
+use Uetiko\Credit\Menu\Infrastructure\Interfaces\MenuRepository as Repository;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotSaveException;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotFindException;
 
@@ -57,13 +57,17 @@ class MenuRepository implements Repository
         );
 
         $this->findAll = $this->connection->prepare(
-            "SELECT r.id, r.id_parent, r.id_child
+            "SELECT r.id_parent, r.id_child, r.id
                        FROM menu_relationship r
                        order by r.id_parent asc;
             "
         );
 
-        $this->findRelation = $this->connection->prepare();
+        $this->findRelation = $this->connection->prepare(
+            "SELECT id, id_parent, id_child
+                       FROM menu_relationship
+                       WHERE id_parent = :id"
+        );
     }
 
     /**
@@ -148,8 +152,15 @@ class MenuRepository implements Repository
 
     public function findAll(): array
     {
-        $statement = $this->connection->query();
-        return $statement->fetch(PDO::FETCH_ASSOC);
+        $result = [];
+        $this->findAll->execute();
+        $result = $this->findAll->fetchAll(PDO::FETCH_ASSOC);
+
+        if(true == empty($result)){
+            throw new MenuNotFindException();
+        } else {
+            return $result;
+        }
     }
 
     public function update(string $id, string $name, string $description): bool
