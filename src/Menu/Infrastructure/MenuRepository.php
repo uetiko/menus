@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Uetiko\Credit\Menu\Infrastructure;
 use PDO;
 use PDOException;
+use Uetiko\Credit\Menu\Domain\Menu;
 use Uetiko\Credit\Menu\Infrastructure\Settings;
 use Uetiko\Credit\Menu\Infrastructure\Interfaces\Repository;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotSaveException;
@@ -11,22 +12,90 @@ use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotFindException;
 class MenuRepository implements Repository
 {
     private $connection = Null;
+    /** @var $insert \PDOStatement */
+    private $insert = null;
+    /** @var \PDOStatement */
+    private $insertRelationship = null;
+    private $update = null;
+    private $delete = null;
 
-    public function __construct(Settins $setting)
+    public function __construct(Settings $setting)
     {
-        $this->connection = new PDO();
+        $dsn = "mysql:dbname={$setting->getDatabaseName()};host={$setting->getDatabaseHostName()}";
+
+        $this->connection = new PDO(
+            $dsn,
+            $setting->getDatabaseUserName(),
+            $setting->getDatabasePassword()
+        );
+        $this->insert = $this->connection->prepare(
+            "INSERT INTO menu (id, name, description)
+                       VALUES (:id, :name, :description)"
+        );
+        $this->insertRelationship = $this->connection->prepare(
+            "INSERT INTO menu_relationship(id, id_parent, id_child)
+                       VALUES (:id, :id_parent, :id_child)"
+        );
     }
 
+    /**
+     * @param int $id
+     * @param string $name
+     * @param string $description
+     * @return bool
+     * @throws MenuNotSaveException
+     */
     public function save(int $id, string $name, string $description): bool
     {
         $this->connection->beginTransaction();
 
+        $this->insert->bindParam(':id', $id);
+        $this->insert->bindParam(':name', $name);
+        $this->insert->bindParam(':description', $description);
+
         try{
-            $this->connection->exec();
-            return $this->connection->commit();
+
+            $result = $this->insert->execute();
         }catch (PDOException $exception){
             $this->connection->rollBack();
             throw new MenuNotSaveException();
+        }
+
+        if (false == $result){
+            throw new MenuNotSaveException();
+        }else{
+            return $this->connection->commit();
+        }
+    }
+
+    /**
+     * @param int $id
+     * @param Menu $parent
+     * @param Menu $child
+     * @return bool
+     * @throws MenuNotSaveException
+     */
+    public function saveMenuRelation(int $id, Menu $parent, Menu $child): bool
+    {
+        $result = false;
+        $this->insertRelationship->bindParam(':id', $id);
+        $this->insertRelationship->bindParam(':id_parent', $parent->getId());
+        $this->insertRelationship->bindParam(':id_child', $child->getId());
+
+        $this->connection->beginTransaction();
+
+        try{
+            $result = $this->insertRelationship->execute();
+            $this->connection->commit();
+        } catch (PDOException $exception) {
+            $this->connection->rollBack();
+            throw new MenuNotSaveException();
+        }
+
+        if (false == $result) {
+            throw new MenuNotSaveException();
+        } else {
+            return $result;
         }
     }
 

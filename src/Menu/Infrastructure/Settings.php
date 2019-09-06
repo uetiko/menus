@@ -49,6 +49,4 @@ class Settings
     {
         return $this->databaseSchema;
     }
-
-
 }
