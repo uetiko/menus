@@ -4,9 +4,10 @@ namespace Uetiko\Credit\Menu\Infrastructure\Interfaces;
 
 interface Repository
 {
-    public function save(int $id, string $name, string $description): bool;
-    public function findById(int $id): array;
+    public function save(string $id, string $name, string $description): bool;
+    public function saveMenuRelation(string $id, Menu $parent, Menu $child): bool;
+    public function findById(string $id): array;
     public function findAll(): array ;
-    public function update(int $id, string $name, string $description): bool;
-    public function delete(int $id): bool;
+    public function update(string $id, string $name, string $description): bool;
+    public function delete(string $id): bool;
 }

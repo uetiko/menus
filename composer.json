@@ -9,6 +9,9 @@
       "email": "uetiko@gmail.com"
     }
   ],
+  "require": {
+    "ramsey/uuid": "*"
+  },
   "autoload": {
     "psr-4": {
       "Uetiko\\Credit\\": "src/"

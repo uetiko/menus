@@ -75,7 +75,7 @@ class MenuRepository implements Repository
      * @return bool
      * @throws MenuNotSaveException
      */
-    public function saveMenuRelation(int $id, Menu $parent, Menu $child): bool
+    public function saveMenuRelation(string $id, Menu $parent, Menu $child): bool
     {
         $result = false;
         $this->insertRelationship->bindParam(':id', $id);
