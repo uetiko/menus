@@ -49,4 +49,21 @@ class MenuFinder
 
         return $menu;
     }
+
+    /**
+     * @param string $id
+     * @return array<MenuRelationship>
+     * @throws \Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotFindException
+     */
+    public function findAllChildren(string $id): array {
+        $menu = [];
+        $menuParent = $this->findById($id);
+        $children = $this->menuRepository->findMenuRelationshipChildrenByid($id);
+
+        foreach ($children as $child) {
+            $menu[] = new MenuRelationship(
+                $child['id'], $menuParent, $this->findById($child['id_child'])
+            );
+        }
+    }
 }
