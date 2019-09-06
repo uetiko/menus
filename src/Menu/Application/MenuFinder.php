@@ -14,8 +14,17 @@ class MenuFinder
         $this->menuRepository = $menuRepository;
     }
 
-    public function findById(int $id): Menu
-    {}
+    /**
+     * @param string $id
+     * @return Menu
+     * @throws \Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotFindException
+     */
+    public function findById(string $id): Menu
+    {
+        $result = [];
+        $result = $this->menuRepository->findById($id);
+        return new Menu($result['id'], $result['name'], $result['description']);
+    }
 
     public function findAll(): array{}
 }
