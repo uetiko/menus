@@ -18,15 +18,6 @@ interface Repository
 
     /**
      * @param string $id
-     * @param Menu $parent
-     * @param Menu $child
-     * @return bool
-     * @throws MenuNotSaveException
-     */
-    public function saveMenuRelation(string $id, Menu $parent, Menu $child): bool;
-
-    /**
-     * @param string $id
      * @return array
      * @throws MenuNotFindException
      */
