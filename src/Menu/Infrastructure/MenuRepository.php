@@ -66,7 +66,8 @@ class MenuRepository implements Repository
         $this->findRelation = $this->connection->prepare(
             "SELECT id, id_parent, id_child
                        FROM menu_relationship
-                       WHERE id_parent = :id"
+                       WHERE id_parent = :id
+                       order by id asc "
         );
     }
 
@@ -195,5 +196,24 @@ class MenuRepository implements Repository
     public function __destruct()
     {
         $this->connection = null;
+    }
+
+    /**
+     * @param string $id
+     * @return array
+     * @throws MenuNotFindException
+     */
+    public function findMenuRelationshipChildrenByid(string $id): array
+    {
+        $find = [];
+        $this->findRelation->bindParam(':id', $id);
+        $this->findRelation->execute();
+        $find = $this->findRelation->fetchAll(PDO::FETCH_ASSOC);
+
+        if(true == empty($find)) {
+            throw new MenuNotFindException();
+        } else {
+            return $find;
+        }
     }
 }
