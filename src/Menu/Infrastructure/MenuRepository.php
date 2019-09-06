@@ -45,7 +45,7 @@ class MenuRepository implements Repository
      * @return bool
      * @throws MenuNotSaveException
      */
-    public function save(int $id, string $name, string $description): bool
+    public function save(string $id, string $name, string $description): bool
     {
         $this->connection->beginTransaction();
 
@@ -99,7 +99,7 @@ class MenuRepository implements Repository
         }
     }
 
-    public function findById(int $id): array
+    public function findById(string $id): array
     {
         $statement = $this->connection->query();
         return  $statement->fetch(PDO::FETCH_ASSOC);
@@ -111,7 +111,7 @@ class MenuRepository implements Repository
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update(int $id, string $name, string $description): bool
+    public function update(string $id, string $name, string $description): bool
     {
         $rows = 0;
         $rows = $this->connection->exec();
@@ -123,7 +123,7 @@ class MenuRepository implements Repository
         return true;
     }
 
-    public function delete(int $id): bool
+    public function delete(string $id): bool
     {
         $rows = 0;
 

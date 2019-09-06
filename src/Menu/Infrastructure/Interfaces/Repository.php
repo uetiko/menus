@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace Uetiko\Credit\Menu\Infrastructure\Interfaces;
+use Uetiko\Credit\Menu\Domain\Menu;
 
 interface Repository
 {
