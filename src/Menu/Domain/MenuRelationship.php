@@ -6,15 +6,23 @@ use Uetiko\Credit\Menu\Domain\Menu;
 
 class MenuRelationship
 {
+    /** @var $id string */
+    private $id = null;
     /** @var \Uetiko\Credit\Menu\Domain\Menu */
     private $parent = Null;
     /** @var \Uetiko\Credit\Menu\Domain\Menu */
     private $child = Null;
 
-    public function __construct(Menu $parent, Menu $child)
+    public function __construct(string $id, Menu $parent, Menu $child)
     {
+        $this->id = $id;
         $this->parent = $parent;
         $this->child = $child;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     /**

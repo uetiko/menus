@@ -6,14 +6,14 @@ namespace Uetiko\Credit\Menu\Domain;
 
 class Menu
 {
-    /** @var $id int */
+    /** @var $id string */
     private $id = null;
     /** @var $name string */
     private $name = null;
     /** @var $description string */
     private $description = null;
 
-    public function __construct(int $id, string $name, string $description)
+    public function __construct(string $id, string $name, string $description)
     {
         $this->id = $id;
         $this->name = $name;
@@ -21,9 +21,9 @@ class Menu
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -31,7 +31,7 @@ class Menu
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -39,7 +39,7 @@ class Menu
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
