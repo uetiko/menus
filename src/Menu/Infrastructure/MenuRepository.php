@@ -4,6 +4,7 @@ namespace Uetiko\Credit\Menu\Infrastructure;
 use PDO;
 use PDOException;
 use Uetiko\Credit\Menu\Domain\Menu;
+use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotHaveChildrenException;
 use Uetiko\Credit\Menu\Infrastructure\Settings;
 use Uetiko\Credit\Menu\Infrastructure\Interfaces\MenuRepository as Repository;
 use Uetiko\Credit\Menu\Infrastructure\Exceptions\MenuNotSaveException;
@@ -20,6 +21,8 @@ class MenuRepository implements Repository
     private $update = null;
     /** @var $delete \PDOStatement */
     private $delete = null;
+    /** @var \PDOStatement $deleteRelationship */
+    private $deleteRelationship = null;
     /** @var $find \PDOStatement */
     private $find = null;
     /** @var $findRelation \PDOStatement */
@@ -68,6 +71,14 @@ class MenuRepository implements Repository
                        FROM menu_relationship
                        WHERE id_parent = :id
                        order by id asc "
+        );
+
+        $this->delete = $this->connection->prepare(
+            "delete from menu where id = :id"
+        );
+
+        $this->deleteRelationship = $this->connection->prepare(
+            "delete from menu_relationship where id_parent = :idParent"
         );
     }
 
@@ -215,5 +226,21 @@ class MenuRepository implements Repository
         } else {
             return $find;
         }
+    }
+
+    /**
+     * @param string $id
+     * @return bool
+     * @throws MenuNotHaveChildrenException
+     */
+    public function deleteOnlyChildren(string $id): bool
+    {
+        try {
+            $children = $this->findMenuRelationshipChildrenByid($id);
+        } catch (MenuNotFindException $exception) {
+            throw new MenuNotHaveChildrenException();
+        }
+
+        foreach ($children as $child) {}
     }
 }

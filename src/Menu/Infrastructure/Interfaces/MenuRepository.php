@@ -26,4 +26,11 @@ interface MenuRepository extends Repository
      * @throws MenuNotFindException
      */
     public function findMenuRelationshipChildrenByid(string $id): array ;
+
+    /**
+     * @param string $id
+     * @return bool
+     * @throws MenuNotFindException
+     */
+    public function deleteOnlyChildren(string $id): bool;
 }
